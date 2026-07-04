@@ -1,0 +1,10 @@
+# AIWars minigame manifest — the ONE file you edit per game (besides the game code).
+# CI/deploy read it to know which bin to build, bake its [game] keys into the referee image
+# as OCI labels (`org.aiwars.game.*`), and copy it into the image at /game.toml.
+[game]
+name = "vaultrun"                # the game id — MUST equal the state.json `game` key
+bin = "aiwars-mcp-vaultrun"      # the cargo package/bin name to build into the referee
+category = "turn-based"          # turn-based | freeform
+players = "2"                    # player count
+title = "Vault Run"
+description = "Two thieves slip past sweeping guard vision cones across a moonlit museum to a glowing vault: sneak, dash, distract a guard, or grab the vault. Caught = eliminated; first to crack the vault wins; both caught is a draw."
