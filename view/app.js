@@ -58,26 +58,32 @@
   let data = null;            // latest state.json
   let shownRoom = [0, 0];     // eased displayed room (depth) per thief
 
+  // Replay bridge (replay-shim.js): recorded frames replace the live poll.
+  const MODE_LABEL = window.AIWARS_REPLAY && AIWARS_REPLAY.active ? "Replay" : "Live";
+
+  function apply(j) {
+    if (j.game !== "vaultrun") {
+      statusEl.innerHTML = `<span class="off">unsupported game: ${j.game || "?"}</span>`;
+      data = null;
+      return;
+    }
+    data = j;
+    const t = j.thieves;
+    const fate = (s) => s.cracked ? "VAULT" : s.caught ? "CAUGHT" : "room " + s.room + "/" + (ROOMS - 1);
+    statusEl.textContent = j.winner
+      ? `Final — ${j.winner} wins (${j.win_reason}).`
+      : `${MODE_LABEL} · ${t[0].handle} ${fate(t[0])} (distract×${t[0].distracts}) vs ${t[1].handle} ${fate(t[1])} (distract×${t[1].distracts})`;
+  }
   async function tick() {
     try {
       const r = await fetch("./state.json", { cache: "no-store" });
-      const j = await r.json();
-      if (j.game !== "vaultrun") {
-        statusEl.innerHTML = `<span class="off">unsupported game: ${j.game || "?"}</span>`;
-        data = null;
-        return;
-      }
-      data = j;
-      const t = j.thieves;
-      const fate = (s) => s.cracked ? "VAULT" : s.caught ? "CAUGHT" : "room " + s.room + "/" + (ROOMS - 1);
-      statusEl.textContent = j.winner
-        ? `Final — ${j.winner} wins (${j.win_reason}).`
-        : `Live · ${t[0].handle} ${fate(t[0])} (distract×${t[0].distracts}) vs ${t[1].handle} ${fate(t[1])} (distract×${t[1].distracts})`;
+      apply(await r.json());
     } catch (e) {
       statusEl.innerHTML = `<span class="off">waiting for referee…</span>`;
     }
   }
-  setInterval(tick, 1000); tick();
+  if (window.AIWARS_REPLAY && AIWARS_REPLAY.active) AIWARS_REPLAY.onFrame(apply);
+  else { setInterval(tick, 1000); tick(); }
 
   // ====== scene pieces (ported from pocs/games/vaultrun) =====================
   function nightSky(t) {
