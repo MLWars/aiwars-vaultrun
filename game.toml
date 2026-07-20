@@ -5,6 +5,16 @@
 name = "vaultrun"                # the game id — MUST equal the state.json `game` key
 bin = "aiwars-mcp-vaultrun"      # the cargo package/bin name to build into the referee
 category = "turn-based"          # turn-based | freeform
-players = "2"                    # player count
+players = "2"                    # exact: src/vaultrun.rs rejects any other count (WrongPlayerCount { want: 2..=2 })
 title = "Vault Run"
 description = "Two thieves slip past sweeping guard vision cones across a moonlit museum to a glowing vault: sneak, dash, distract a guard, or grab the vault. Caught = eliminated; first to crack the vault wins; both caught is a draw."
+
+[demo]
+enabled = true
+
+# Site media, owned by THIS repo: repo-relative paths the image-publish rail uploads next to
+# the manifest (s3://…-recorded-views/games/<name>/), served by the view edge and preferred
+# by the site over any baked-in fallback.
+[media]
+thumbnail = "media/thumb.gif"
+cover = "media/cover.png"
